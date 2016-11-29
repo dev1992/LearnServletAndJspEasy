@@ -1,5 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <html>
-    <body>
+  	<body>
         <h2>Body Mass Index!</h2>
         <form name="form" action="FirstServlet" method="POST">
            <table>
@@ -19,5 +20,8 @@
             </table>
         </form>
         <h2>${result}</h2>
+        <pre>
+		   <c:out value="${xmlString != '' ? xmlString : 'no schema found'}" />
+		</pre>
     </body>
 </html>

@@ -1,19 +1,21 @@
 package com.jdevnath.servlets;
 
-import com.jdevnath.pozos.BodyMassIndex;
+import com.jdevnath.pozos.*;
 import java.io.IOException;
+import java.io.StringWriter;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 
 /**
  * Servlet implementation class FirstServlet
  */
-@WebServlet(description = "this is servlet to process the html-form data.", urlPatterns = { "/FirstServlet" })
 public class FirstServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
@@ -31,8 +33,25 @@ public class FirstServlet extends HttpServlet {
 		// TODO Auto-generated method stub
 		response.getWriter().append("Served at: ").append(request.getContextPath());
 		String name = request.getParameter("name");
+		String height = request.getParameter("height");
 		String weight = request.getParameter("weight");
-        String height = request.getParameter("height");
+        
+        Person p1 = new Person(name, height, weight);
+        
+        String xmlString = "";
+        try {
+            JAXBContext context = JAXBContext.newInstance(Person.class);
+            Marshaller m = context.createMarshaller();
+
+            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE); // To format XML
+
+            StringWriter sw = new StringWriter();
+            m.marshal(p1, sw);
+            xmlString = sw.toString();
+
+        } catch (JAXBException e) {
+            e.printStackTrace();
+        }
         
         BodyMassIndex bmi = new BodyMassIndex();
         Double bmiResult = -1.0;
@@ -41,9 +60,10 @@ public class FirstServlet extends HttpServlet {
 		}
         
         String result = "The bmi for "+name+" is: "+bmiResult;
-        System.out.println("---> "+result);
+        System.out.println("---> "+xmlString);
         if (bmiResult != -1.0) {
             request.setAttribute("result", result);
+            request.setAttribute("xmlString", xmlString);
             RequestDispatcher dispatcher = request.getRequestDispatcher("index.jsp");
             dispatcher.forward(request, response);
         } else {
